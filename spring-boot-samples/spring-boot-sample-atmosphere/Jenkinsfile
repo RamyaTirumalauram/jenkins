@@ -40,9 +40,17 @@ pipeline {
 }
 def notify(status){
     emailext (
-      to: "anil.maharshi@gmail.com",
+      to: "ramya.tirumalapuram@gmail.com",
       subject: "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
       body: """<p>${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
         <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} 	[${env.BUILD_NUMBER}]</a></p>""",
     	)
  }
+try {
+stage("Building SONAR ...") {
+sh './gradlew clean sonarqube'
+}
+} catch (e) {emailext attachLog: true, body: 'See attached log', subject: 'BUSINESS Build Failure', to: 'priyarajanala1@gmail.com'
+step([$class: 'WsCleanup'])
+return
+}
